@@ -244,3 +244,17 @@ iniciar_jogo :-
 % status_do_jogo :- apresentar status do modo de jogo, tempo, quantidade de bombas e campo
 % explorar_sistema :- definir algoritmo que ao executar explora o sistema do campo
 
+%% fazer simples algoritmo exploratorio depois
+% faz uma verificação em cada item da matriz
+% se o item for >0 faz a analise se os elementos ao seu redor são igual ao seu numero
+% se sim marcar cada elemento nao descoberto ao seu redor
+% depois disso selecionar os campos que todos ao seu redor ja estiverem marcados
+% repetir a verificação e suas etapas a seguir
+
+explorar_sistema :-
+	verify_end_game, !.
+explorar_sistema :-
+	verificar_cada_campo,
+	marcar_possiveis,
+	selecionar_campos_garantidos,
+	explorar_sistema.
