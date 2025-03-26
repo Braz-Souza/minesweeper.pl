@@ -49,13 +49,12 @@ random_pos(R, N) :-
 gerar_bomba(GRID) :- 
 	random_pos(X, GRID),
 	random_pos(Y, GRID),
-	\+bomba(X,Y),
-	assertz(bomba(X,Y)), !.
-gerar_bomba(GRID) :- 
-	random_pos(X, GRID),
-	random_pos(Y, GRID),
-	bomba(X,Y),
-	gerar_bomba(GRID).	
+	gerar_bomba(GRID, X, Y).
+gerar_bomba(GRID, X, Y) :-
+	bomba(X, Y), 
+	gerar_bomba(GRID), !.
+gerar_bomba(GRID, X, Y) :- 
+	assertz(bomba(X,Y)).
 
 % Gera um campo de bombas, com a quantidade sendo
 % definida pelo fato quantidade_bombas/1
