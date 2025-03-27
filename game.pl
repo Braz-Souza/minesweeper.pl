@@ -9,15 +9,15 @@
 :- dynamic qtd_descobertos/1.
 
 quantidade_bombas(10).
-tamanho_grid(8).
+tamanho_grid(10).
 qtd_descobertos(0).
 
 % Deleta todos os descobertos
-delete_all_descobertos :- !.
 delete_all_descobertos :-
 	descoberto(X, Y, _),
 	retract(descoberto(X,Y,_)),
 	delete_all_descobertos.
+delete_all_descobertos :- !.
 
 % Coloca o falor de campos descobertos para 0
 % E deleta todos os descobertos
@@ -53,7 +53,7 @@ gerar_bomba(GRID) :-
 gerar_bomba(GRID, X, Y) :-
 	bomba(X, Y), 
 	gerar_bomba(GRID), !.
-gerar_bomba(GRID, X, Y) :- 
+gerar_bomba(_, X, Y) :- 
 	assertz(bomba(X,Y)).
 
 % Gera um campo de bombas, com a quantidade sendo
@@ -114,10 +114,13 @@ campo(L) :- tamanho_grid(N), matriz(L, N).
 
 % Definição para printar o campo
 print_campo :- 
-	write('\nX -  1 2 3 4 5 6 7 8\n'), % TODO: trocar para poder ficar o tamanho modularizado
-	campo(L), 
-	tamanho_grid(N),
-	print_matriz(L, N).
+    tamanho_grid(N),
+    numlist(1, N, Numbers),
+    maplist(atom_number, Atoms, Numbers),
+    atomic_list_concat(Atoms, ' ', Header),
+    format('\nX -  ~w\n', [Header]),
+    campo(L), 
+    print_matriz(L, N).
 
 % Regra para ver se existe uma bomba 
 % se existir R=:=1, caso R=:=0
