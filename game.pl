@@ -308,79 +308,82 @@ status_do_jogo :-
 % repetir a verificação e suas etapas a seguir
 
 explorar_sistema :-
-	\+has_game_ended,
-	verificar_cada_campo,
-	explorar_sistema.
+        selecionar_aleatorio,
+        explorar_sistema(3), !.
 
-explorar_sistema(0) :-print_campo, !.
+explorar_sistema(0) :-
+        finalizado(0),
+        explorar_sistema, !.
+explorar_sistema(0) :-
+        finalizado(1),
+        print_campo, !.
 explorar_sistema(N) :-
-	verificar_cada_campo,
-	S is N-1,
-	explorar_sistema(S).
+        verificar_cada_campo,
+        S is N-1,
+        explorar_sistema(S).
 
-verificar_cada_campo :- 
-	tamanho_grid(GRID),
-	CAMPOS is GRID*GRID,
-	verificar_cada_campo(CAMPOS, GRID).
+verificar_cada_campo :-
+        tamanho_grid(GRID),
+        CAMPOS is GRID*GRID,
+        verificar_cada_campo(CAMPOS, GRID).
 
 verificar_cada_campo(0, _) :- !.
 verificar_cada_campo(N, GRID) :-
-	X is (N-1)//GRID +1,
-	Y is (N-1) mod GRID +1,
-	NewN is N-1,
-	marcar_possiveis(X, Y),
-	selecionar_possiveis_de(X, Y),
-	verificar_cada_campo(NewN, GRID).
-
+        X is (N-1)//GRID +1,
+        Y is (N-1) mod GRID +1,
+        NewN is N-1,
+        marcar_possiveis(X, Y),
+        selecionar_possiveis_de(X, Y),
+        verificar_cada_campo(NewN, GRID).
 
 marcar_possiveis(X, Y) :-
-	descoberto(X, Y, V),
-	nao_descoberto_ao_redor(X, Y, ND), 
-	V == ND,
-	marcar_ao_redor_de(X,Y).
+        descoberto(X, Y, V),
+        nao_descoberto_ao_redor(X, Y, ND),
+        V == ND,
+        marcar_ao_redor_de(X,Y).
 marcar_possiveis(_, _) :- !.
 
 e_descoberto(X, Y, 0) :-
-	fora_do_grid(X, Y), !.
-e_descoberto(X, Y, 0) :- 
-	descoberto(X,Y,_), !.
+        fora_do_grid(X, Y), !.
+e_descoberto(X, Y, 0) :-
+        descoberto(X,Y,_), !.
 e_descoberto(X, Y, 1) :-
-	\+descoberto(X,Y,_).
+        \+descoberto(X,Y,_).
 
 nao_descoberto_ao_redor(X, Y, R) :-
-	UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
-	e_descoberto(UP, Y, R1), 
-	e_descoberto(DOWN, Y, R2), 
-	e_descoberto(X, LEFT, R3), 
-	e_descoberto(X, RIGHT, R4),
-	e_descoberto(UP, LEFT, R5), 
-	e_descoberto(DOWN, LEFT, R6), 
-	e_descoberto(UP, RIGHT, R7), 
-	e_descoberto(DOWN, RIGHT, R8),
-	R is R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8.
+        UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
+        e_descoberto(UP, Y, R1),
+        e_descoberto(DOWN, Y, R2),
+        e_descoberto(X, LEFT, R3),
+        e_descoberto(X, RIGHT, R4),
+        e_descoberto(UP, LEFT, R5),
+        e_descoberto(DOWN, LEFT, R6),
+        e_descoberto(UP, RIGHT, R7),
+        e_descoberto(DOWN, RIGHT, R8),
+        R is R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8.
 
 marcar_ao_redor_de(X, Y) :-
-	UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
-	mark(UP, Y), 
-	mark(DOWN, Y), 
-	mark(X, LEFT), 
-	mark(X, RIGHT),
-	mark(UP, LEFT), 
-	mark(DOWN, LEFT), 
-	mark(UP, RIGHT), 
-	mark(DOWN, RIGHT).
+        UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
+        mark(UP, Y),
+        mark(DOWN, Y),
+        mark(X, LEFT),
+        mark(X, RIGHT),
+        mark(UP, LEFT),
+        mark(DOWN, LEFT),
+        mark(UP, RIGHT),
+        mark(DOWN, RIGHT).
 
 mark(X, Y) :-
-	fora_do_grid(X, Y), !.
+        fora_do_grid(X, Y), !.
 
 mark(X, Y) :-
-	descoberto(X, Y, _), !.
+        descoberto(X, Y, _), !.
 
 mark(X,Y) :-
-	marcado(X,Y), !.
+        marcado(X,Y), !.
 
 mark(X, Y) :-
-	assertz(marcado(X,Y)).
+        assertz(marcado(X,Y)).
 
 selecionar_possiveis_de(X, Y) :-
         descoberto(X, Y, V),
@@ -409,15 +412,15 @@ marcado_ao_redor(X, Y, R) :-
         R is R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8.
 
 selecionar_aleatorio :-
-	tamanho_grid(GRID),
-	random_pos(X, GRID),
-	random_pos(Y, GRID),
-	selecionar_aleatorio(X, Y).
+        tamanho_grid(GRID),
+        random_pos(X, GRID),
+        random_pos(Y, GRID),
+        selecionar_aleatorio(X, Y).
 selecionar_aleatorio(X, Y) :-
-	marcado(X, Y),
-	selecionar_aleatorio, !.
+        marcado(X, Y),
+        selecionar_aleatorio, !.
 selecionar_aleatorio(X, Y) :-
-	descoberto(X, Y, _),
-	selecionar_aleatorio, !.
+        descoberto(X, Y, _),
+        selecionar_aleatorio, !.
 selecionar_aleatorio(X, Y) :-
-	selecionar(X, Y).
+        select(X, Y).
