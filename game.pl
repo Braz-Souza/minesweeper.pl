@@ -234,12 +234,14 @@ marcar(X, Y) :-
 
 marcar(X, Y) :-
 	marcado(X, Y),
-	retract(marcado(X,Y)), 
+	retract(marcado(X,Y)),
 	print_campo, !.
 
 marcar(X, Y) :- 
 	assertz(marcado(X,Y)),
 	print_campo.
+
+% Define a marcação sem fazer print do campo
 
 % Faz o inicio do jogo, reiniciando a quantidade de descobertos
 % gerando as bombas necessarias para o jogo iniciar
@@ -306,10 +308,15 @@ status_do_jogo :-
 % repetir a verificação e suas etapas a seguir
 
 explorar_sistema :-
-	has_game_ended, !.
-explorar_sistema :-
+	\+has_game_ended,
 	verificar_cada_campo,
-	print_campo.
+	explorar_sistema.
+
+explorar_sistema(0) :-print_campo, !.
+explorar_sistema(N) :-
+	verificar_cada_campo,
+	S is N-1,
+	explorar_sistema(S).
 
 verificar_cada_campo :- 
 	tamanho_grid(GRID),
@@ -324,6 +331,7 @@ verificar_cada_campo(N, GRID) :-
 	marcar_possiveis(X, Y),
 	selecionar_possiveis_de(X, Y),
 	verificar_cada_campo(NewN, GRID).
+
 
 marcar_possiveis(X, Y) :-
 	descoberto(X, Y, V),
@@ -353,14 +361,26 @@ nao_descoberto_ao_redor(X, Y, R) :-
 
 marcar_ao_redor_de(X, Y) :-
 	UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
-	marcar(UP, Y), 
-	marcar(DOWN, Y), 
-	marcar(X, LEFT), 
-	marcar(X, RIGHT),
-	marcar(UP, LEFT), 
-	marcar(DOWN, LEFT), 
-	marcar(UP, RIGHT), 
-	marcar(DOWN, RIGHT).
+	mark(UP, Y), 
+	mark(DOWN, Y), 
+	mark(X, LEFT), 
+	mark(X, RIGHT),
+	mark(UP, LEFT), 
+	mark(DOWN, LEFT), 
+	mark(UP, RIGHT), 
+	mark(DOWN, RIGHT).
+
+mark(X, Y) :-
+	fora_do_grid(X, Y), !.
+
+mark(X, Y) :-
+	descoberto(X, Y, _), !.
+
+mark(X,Y) :-
+	marcado(X,Y), !.
+
+mark(X, Y) :-
+	assertz(marcado(X,Y)).
 
 selecionar_possiveis_de(X, Y) :-
         descoberto(X, Y, V),
@@ -388,3 +408,16 @@ marcado_ao_redor(X, Y, R) :-
         e_marcado(DOWN, RIGHT, R8),
         R is R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8.
 
+selecionar_aleatorio :-
+	tamanho_grid(GRID),
+	random_pos(X, GRID),
+	random_pos(Y, GRID),
+	selecionar_aleatorio(X, Y).
+selecionar_aleatorio(X, Y) :-
+	marcado(X, Y),
+	selecionar_aleatorio, !.
+selecionar_aleatorio(X, Y) :-
+	descoberto(X, Y, _),
+	selecionar_aleatorio, !.
+selecionar_aleatorio(X, Y) :-
+	selecionar(X, Y).
