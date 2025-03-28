@@ -162,6 +162,7 @@ fora_do_grid(X, Y) :-
 % Regra para fazer a seleção de uma posição
 % para a recursão se o 
 % 	campo selecionado está fora do grid definido
+% 	campo selecionado está marcado no momento
 % 	campo selecionado ja foi descoberto
 % Se encontrar uma bomba o jogo acaba mostrando as bombas
 % Se o campo selecionado não houver bombas ao redor
@@ -174,6 +175,9 @@ select(X, Y) :-
 
 select(X, Y) :- 
 	descoberto(X, Y, _), !.
+
+select(X, Y) :-
+	marcado(X, Y), !.
 
 select(X, Y) :- 
 	bomba(X, Y), 
@@ -305,8 +309,6 @@ explorar_sistema :-
 	has_game_ended, !.
 explorar_sistema :-
 	verificar_cada_campo,
-	marcar_possiveis,
-	selecionar_campos_garantidos,
 	print_campo.
 
 verificar_cada_campo :- 
@@ -320,6 +322,7 @@ verificar_cada_campo(N, GRID) :-
 	Y is (N-1) mod GRID +1,
 	NewN is N-1,
 	marcar_possiveis(X, Y),
+	selecionar_possiveis_de(X, Y),
 	verificar_cada_campo(NewN, GRID).
 
 marcar_possiveis(X, Y) :-
@@ -359,7 +362,29 @@ marcar_ao_redor_de(X, Y) :-
 	marcar(UP, RIGHT), 
 	marcar(DOWN, RIGHT).
 
+selecionar_possiveis_de(X, Y) :-
+        descoberto(X, Y, V),
+        marcado_ao_redor(X, Y, M),
+        V == M,
+        limpar_ao_redor(X,Y).
+selecionar_possiveis_de(_, _) :- !.
 
-selecionar_campos_garantidos :-
-	write("Selecionando campos garantidos\n").
+e_marcado(X, Y, 0) :-
+        fora_do_grid(X, Y), !.
+e_marcado(X, Y, 0) :-
+        \+marcado(X,Y), !.
+e_marcado(X, Y, 1) :-
+        marcado(X,Y).
+
+marcado_ao_redor(X, Y, R) :-
+        UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
+        e_marcado(UP, Y, R1),
+        e_marcado(DOWN, Y, R2),
+        e_marcado(X, LEFT, R3),
+        e_marcado(X, RIGHT, R4),
+        e_marcado(UP, LEFT, R5),
+        e_marcado(DOWN, LEFT, R6),
+        e_marcado(UP, RIGHT, R7),
+        e_marcado(DOWN, RIGHT, R8),
+        R is R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8.
 
