@@ -10,8 +10,8 @@
 :- dynamic start_time/1.
 :- dynamic finalizado/1.
 
-quantidade_bombas(10).
-tamanho_grid(10).
+quantidade_bombas(9).
+tamanho_grid(9).
 qtd_descobertos(0).
 finalizado(0).
 
