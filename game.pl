@@ -293,31 +293,6 @@ status_do_jogo :-
     write('Bandeiras corretas: '), write(CorrectFlags), write('/'), write(Bombs), nl,
     write('Campo final:'), nl.
 
-%% COMO JOGAR?
-% 1) inicie o jogo com a regra `iniciar_jogo.`
-% 2) Escolha um campo para selecionar com `selecionar(X,Y)` trocando
-% 	X para a linha escolhida
-% 	Y para a coluna escolhida
-% 3) Escolha um campo para marcar com a possibilidade de bomba com `marcar(X,Y)` trocando
-% 	X para a linha escolhida
-% 	Y para a coluna escolhida
-% 4) Após selecionar todos os campos permitidos (TODO: ou marcar todas as bombas corretas)
-% 	o jogo termina com vitoria
-
-%% TODO
-% fim_jogo :- definir fim de jogo e apresentar o jogo completo
-% vitoria :- definir tela de vitoria apresentando junto os status_do_jogo
-% derrota :- definir tela de derrota apresentando junto os status_do_jogo
-% status_do_jogo :- apresentar status do modo de jogo, tempo, quantidade de bombas e campo
-% explorar_sistema :- definir algoritmo que ao executar explora o sistema do campo
-
-%% fazer simples algoritmo exploratorio depois
-% faz uma verificação em cada item da matriz
-% se o item for >0 faz a analise se os elementos ao seu redor são igual ao seu numero
-% se sim marcar cada elemento nao descoberto ao seu redor
-% depois disso selecionar os campos que todos ao seu redor ja estiverem marcados
-% repetir a verificação e suas etapas a seguir
-
 explorar_sistema :-
         selecionar_aleatorio,
         explorar_sistema(3), !.
