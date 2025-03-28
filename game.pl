@@ -14,7 +14,6 @@ qtd_descobertos(0).
 
 % Deleta todos os descobertos
 delete_all_descobertos :-
-	descoberto(X, Y, _),
 	retract(descoberto(X,Y,_)),
 	delete_all_descobertos.
 delete_all_descobertos :- !.
@@ -38,6 +37,12 @@ mostrar_bombas :-
 	\+descoberto(X,Y,9), 
 	assertz(descoberto(X, Y, 9)), 
 	mostrar_bombas.
+
+% Remove a definição de todas as bombas do campo 
+reset_bombas :-
+	retract(bomba(X,Y)),
+	reset_bombas.
+reset_bombas :- !.
 
 % Gera uma posição aleatoria R para um tamanho N
 random_pos(R, N) :-
@@ -242,6 +247,7 @@ marcar(X, Y) :-
 % faz o print do campo
 iniciar_jogo :-
 	reset_descobertos,
+	reset_bombas,
 	quantidade_bombas(N),
 	gerar_campo_bombas(N),
 	print_campo.
