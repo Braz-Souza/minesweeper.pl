@@ -7,6 +7,7 @@
 :- dynamic quantidade_bombas/1.
 :- dynamic tamanho_grid/1.
 :- dynamic qtd_descobertos/1.
+:- dynamic start_time/1.
 
 quantidade_bombas(10).
 tamanho_grid(10).
@@ -33,6 +34,7 @@ mostrar_bombas :-
 	\+descoberto(X,Y,9), 
 	assertz(descoberto(X, Y, 9)), 
 	mostrar_bombas.
+mostrar_bombas :- !.
 
 % Gera uma posição aleatoria R para um tamanho N
 random_pos(R, N) :-
@@ -175,8 +177,9 @@ select(X, Y) :-
 
 select(X, Y) :- 
 	bomba(X, Y), 
-	write('JOGO FINALIZADO, BOMBA SELECIONADA!'),
-	mostrar_bombas, !.
+	mostrar_bombas,
+	nl, write('===== DERROTA ====='), nl,
+	status_do_jogo, !.
 
 select(X, Y) :-  
 	olhar_ao_redor(X,Y, 0),
@@ -194,14 +197,16 @@ select(X, Y) :-
 % Regra para verificar o fim de jogo
 % Verificando se a area do grid é igual 
 % a soma entre os itens descobertos e as bombas
-verify_end_game :- !.
 verify_end_game :- 
 	quantidade_bombas(N),
 	tamanho_grid(L),
 	qtd_descobertos(X),	
 	S is L*L - X,
-       	N == S,	
-	write('Fim de jogo atingido, parabéns!!').
+       	N =:= S,	
+	nl, write('===== VITÓRIA ====='), nl,
+	status_do_jogo.
+
+verify_end_game :- !.
 
 % Regra que retorna true se o jogo acabou
 has_game_ended :-
@@ -236,11 +241,40 @@ marcar(X, Y) :-
 % gerando as bombas necessarias para o jogo iniciar
 % faz o print do campo
 iniciar_jogo :-
+    retractall(start_time(_)),
+    get_time(StartTime),
+    assertz(start_time(StartTime)),
 	reset_campo,
 	quantidade_bombas(N),
 	gerar_campo_bombas(N),
 	print_campo.
 
+format_time(Seconds, Formatted) :-
+    Minutes is floor(Seconds / 60),
+    RemainingSeconds is integer(Seconds - Minutes * 60),
+    format(atom(Formatted), '~`0t~d~2|:~`0t~d~2|', [Minutes, RemainingSeconds]).
+
+status_do_jogo :-
+    start_time(Start),
+    get_time(End),
+    Elapsed is End - Start,
+    format_time(Elapsed, TimeString),
+    quantidade_bombas(Bombs),
+    tamanho_grid(Size),
+    qtd_descobertos(Uncovered),
+    findall(_, marcado(_, _), Flags),
+    length(Flags, FlagsCount),
+    findall(1, (marcado(X, Y), bomba(X, Y)), CorrectFlagsList),
+    length(CorrectFlagsList, CorrectFlags),
+    nl,
+    write('=== STATUS DO JOGO ==='), nl,
+    write('Tempo decorrido: '), write(TimeString), nl,
+    write('Quantidade de bombas: '), write(Bombs), nl,
+    write('Tamanho do grid: '), write(Size), nl,
+    write('Campos descobertos: '), write(Uncovered), nl,
+    write('Bandeiras colocadas: '), write(FlagsCount), nl,
+    write('Bandeiras corretas: '), write(CorrectFlags), write('/'), write(Bombs), nl,
+    write('Campo final:'), nl.
 
 %% COMO JOGAR?
 % 1) inicie o jogo com a regra `iniciar_jogo.`
