@@ -8,16 +8,25 @@
 :- dynamic tamanho_grid/1.
 :- dynamic qtd_descobertos/1.
 :- dynamic start_time/1.
+:- dynamic finalizado/1.
 
 quantidade_bombas(10).
 tamanho_grid(10).
 qtd_descobertos(0).
+finalizado(0).
+
+% Define o jogo como finalizado
+set_fim :- 
+	retract(finalizado(_)),
+	assertz(finalizado(1)).
 
 % Coloca o falor de campos descobertos para 0
 % E deleta todos os descobertos, bombas e marcados
 reset_campo :- 
 	retract(qtd_descobertos(_)),
 	assertz(qtd_descobertos(0)),
+	retract(finalizado(_)),
+	assertz(finalizado(0)),
 	retractall(descoberto(_,_,_)),
 	retractall(bomba(_,_)),
 	retractall(marcado(_,_)).
@@ -182,6 +191,7 @@ select(X, Y) :-
 select(X, Y) :- 
 	bomba(X, Y), 
 	mostrar_bombas,
+	set_fim,
 	nl, write('===== DERROTA ====='), nl,
 	status_do_jogo, !.
 
@@ -207,6 +217,7 @@ verify_end_game :-
 	qtd_descobertos(X),	
 	S is L*L - X,
        	N =:= S,	
+	set_fim,
 	nl, write('===== VITÓRIA ====='), nl,
 	status_do_jogo.
 
