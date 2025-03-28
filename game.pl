@@ -303,6 +303,11 @@ explorar_sistema(0) :-
 explorar_sistema(0) :-
         finalizado(1),
         print_campo, !.
+
+explorar_sistema(_) :-
+		finalizado(1),
+		print_campo, !.
+
 explorar_sistema(N) :-
         verificar_cada_campo,
         S is N-1,
@@ -314,6 +319,8 @@ verificar_cada_campo :-
         verificar_cada_campo(CAMPOS, GRID).
 
 verificar_cada_campo(0, _) :- !.
+verificar_cada_campo(_, _) :-
+		finalizado(1), !.
 verificar_cada_campo(N, GRID) :-
         X is (N-1)//GRID +1,
         Y is (N-1) mod GRID +1,
