@@ -287,14 +287,24 @@ explorar_sistema :-
 	print_campo.
 
 verificar_cada_campo :- 
-	write("Verificando cada campo\n").
+	tamanho_grid(GRID),
+	CAMPOS is GRID*GRID,
+	verificar_cada_campo(CAMPOS, GRID).
+
+verificar_cada_campo(0, _) :- !.
+verificar_cada_campo(N, GRID) :-
+	X is (N-1)//GRID +1,
+	Y is (N-1) mod GRID +1,
+	NewN is N-1,
+	marcar_possiveis(X, Y),
+	verificar_cada_campo(NewN, GRID).
 
 marcar_possiveis(X, Y) :-
-	write("Marcando possiveis\n"),
 	descoberto(X, Y, V),
 	nao_descoberto_ao_redor(X, Y, ND), 
 	V == ND,
 	marcar_ao_redor_de(X,Y).
+marcar_possiveis(_, _) :- !.
 
 e_descoberto(X, Y, 0) :-
 	fora_do_grid(X, Y), !.
