@@ -223,15 +223,6 @@ verify_end_game :-
 
 verify_end_game :- !.
 
-% Regra que retorna true se o jogo acabou
-has_game_ended :-
-	quantidade_bombas(N),
-	tamanho_grid(L),
-	qtd_descobertos(X),	
-	S is L*L - X,
-       	N == S.
-
-
 % Faz a selecao da posicao definida e mostra o campo
 selecionar(X, Y) :-
 	select(X, Y),
