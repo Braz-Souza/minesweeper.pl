@@ -145,14 +145,14 @@ olhar_ao_redor(X, Y, V) :-
 % Y: Posição y para limpar ao redor
 limpar_ao_redor(X, Y) :- 
 	UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
-	select(UP, LEFT),
-	select(UP, RIGHT),
 	select(UP, Y),
-	select(DOWN, LEFT),
-	select(DOWN, RIGHT),
 	select(DOWN, Y),
 	select(X, LEFT),
-	select(Y, RIGHT).
+	select(X, RIGHT),
+	select(UP, LEFT),
+	select(DOWN, LEFT),
+	select(UP, RIGHT),
+	select(DOWN, RIGHT).
 
 % Regra para verificar se a posicao fornecida fica fora do grid
 fora_do_grid(X, Y) :-
