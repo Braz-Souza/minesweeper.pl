@@ -12,18 +12,14 @@ quantidade_bombas(10).
 tamanho_grid(10).
 qtd_descobertos(0).
 
-% Deleta todos os descobertos
-delete_all_descobertos :-
-	retract(descoberto(X,Y,_)),
-	delete_all_descobertos.
-delete_all_descobertos :- !.
-
 % Coloca o falor de campos descobertos para 0
-% E deleta todos os descobertos
-reset_descobertos :- 
+% E deleta todos os descobertos, bombas e marcados
+reset_campo :- 
 	retract(qtd_descobertos(_)),
 	assertz(qtd_descobertos(0)),
-	delete_all_descobertos.
+	retractall(descoberto(_,_,_)),
+	retractall(bomba(_,_)),
+	retractall(marcado(_,_)).
 
 % Adiciona um a quantidade de campos descobertos
 add_descoberto :- 
@@ -37,12 +33,6 @@ mostrar_bombas :-
 	\+descoberto(X,Y,9), 
 	assertz(descoberto(X, Y, 9)), 
 	mostrar_bombas.
-
-% Remove a definição de todas as bombas do campo 
-reset_bombas :-
-	retract(bomba(X,Y)),
-	reset_bombas.
-reset_bombas :- !.
 
 % Gera uma posição aleatoria R para um tamanho N
 random_pos(R, N) :-
@@ -246,8 +236,7 @@ marcar(X, Y) :-
 % gerando as bombas necessarias para o jogo iniciar
 % faz o print do campo
 iniciar_jogo :-
-	reset_descobertos,
-	reset_bombas,
+	reset_campo,
 	quantidade_bombas(N),
 	gerar_campo_bombas(N),
 	print_campo.
