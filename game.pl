@@ -157,6 +157,10 @@ limpar_ao_redor(X, Y) :-
 	select(X, LEFT),
 	select(Y, RIGHT).
 
+% Regra para verificar se a posicao fornecida fica fora do grid
+fora_do_grid(X, Y) :-
+	tamanho_grid(N),
+	(X<1; Y<1; X>N;Y>N), !.
 
 % Regra para fazer a seleção de uma posição
 % para a recursão se o 
@@ -169,9 +173,10 @@ limpar_ao_redor(X, Y) :-
 % X: Pos x para ser selecionada
 % Y: Pos y para ser selecionada
 select(X, Y) :- 
-	tamanho_grid(N),
-	(X<1; Y<1; X>N;Y>N), !.
-select(X, Y) :- descoberto(X, Y, _), !.
+	fora_do_grid(X, Y), !.
+
+select(X, Y) :- 
+	descoberto(X, Y, _), !.
 
 select(X, Y) :- 
 	bomba(X, Y), 
@@ -203,6 +208,15 @@ verify_end_game :-
        	N == S,	
 	write('Fim de jogo atingido, parabéns!!').
 
+% Regra que retorna true se o jogo acabou
+has_game_ended :-
+	quantidade_bombas(N),
+	tamanho_grid(L),
+	qtd_descobertos(X),	
+	S is L*L - X,
+       	N == S.
+
+
 % Faz a selecao da posicao definida e mostra o campo
 selecionar(X, Y) :-
 	select(X, Y),
@@ -210,6 +224,10 @@ selecionar(X, Y) :-
 
 % Define o campo passado como marcado se ja estava marcado
 % 	ou desmarca se já estava marcado
+% 	ou não marca se ja esta descoberto
+marcar(X, Y) :-
+	descoberto(X, Y, _), !.
+
 marcar(X, Y) :-
 	marcado(X, Y),
 	retract(marcado(X,Y)), 
@@ -255,9 +273,54 @@ iniciar_jogo :-
 % repetir a verificação e suas etapas a seguir
 
 explorar_sistema :-
-	verify_end_game, !.
+	has_game_ended, !.
 explorar_sistema :-
 	verificar_cada_campo,
 	marcar_possiveis,
 	selecionar_campos_garantidos,
-	explorar_sistema.
+	print_campo.
+
+verificar_cada_campo :- 
+	write("Verificando cada campo\n").
+
+marcar_possiveis(X, Y) :-
+	write("Marcando possiveis\n"),
+	descoberto(X, Y, V),
+	nao_descoberto_ao_redor(X, Y, ND), 
+	V == ND,
+	marcar_ao_redor_de(X,Y).
+
+e_descoberto(X, Y, 0) :-
+	fora_do_grid(X, Y), !.
+e_descoberto(X, Y, 0) :- 
+	descoberto(X,Y,_), !.
+e_descoberto(X, Y, 1) :-
+	\+descoberto(X,Y,_).
+
+nao_descoberto_ao_redor(X, Y, R) :-
+	UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
+	e_descoberto(UP, Y, R1), 
+	e_descoberto(DOWN, Y, R2), 
+	e_descoberto(X, LEFT, R3), 
+	e_descoberto(X, RIGHT, R4),
+	e_descoberto(UP, LEFT, R5), 
+	e_descoberto(DOWN, LEFT, R6), 
+	e_descoberto(UP, RIGHT, R7), 
+	e_descoberto(DOWN, RIGHT, R8),
+	R is R1 + R2 + R3 + R4 + R5 + R6 + R7 + R8.
+
+marcar_ao_redor_de(X, Y) :-
+	UP is X-1, DOWN is X+1, LEFT is Y-1, RIGHT is Y+1,
+	marcar(UP, Y), 
+	marcar(DOWN, Y), 
+	marcar(X, LEFT), 
+	marcar(X, RIGHT),
+	marcar(UP, LEFT), 
+	marcar(DOWN, LEFT), 
+	marcar(UP, RIGHT), 
+	marcar(DOWN, RIGHT).
+
+
+selecionar_campos_garantidos :-
+	write("Selecionando campos garantidos\n").
+
